@@ -1,0 +1,8 @@
+.idea
+__pycache__
+
+.my_app_credentials
+local_info.py
+
+data/*
+!data/.gitkeep
