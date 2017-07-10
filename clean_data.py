@@ -25,7 +25,7 @@ def clean_pos(screen_name):
 
 def clean_kami_pos(screen_name):
     """
-    kami_positiveのurlを除去する関数
+    urlを除去する関数
     """
     pattern = r"(https:|http:)(.+?)(\n)"
     r = re.compile(pattern)
