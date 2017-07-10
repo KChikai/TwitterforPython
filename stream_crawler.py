@@ -6,6 +6,7 @@ Main Part of Crawler
 
 import os
 import time
+import re
 from twitter import oauth_dance, read_token_file, TwitterStream, OAuth, Twitter
 from local_info import API_key, API_secret
 
@@ -22,14 +23,19 @@ stream = TwitterStream(auth=OAuth(oauth_token, oauth_secret, API_key, API_secret
 # NG words
 check_chara = ('http', '#', '\\', '【', '】')
 
+# regex
+hashtag_pattern = r"[#＃]([\w一-龠ぁ-んァ-ヴーａ-ｚ]+)"
+url_pattern = r"^(https?|ftp)://[A-Za-z0-9.-]*$"
+r = re.compile(url_pattern)
+
 
 def trim(text):
-    """ 改行を適当に置き換える """
+    """ replace newline characters with other characters"""
     return text.replace('\r', ' ').replace('\n', ' ')
 
 
 def check(text):
-    """ 禁止文字のチェックを行う """
+    """ check NG words  """
     for char in check_chara:
         if char in text:
             return False
@@ -37,14 +43,21 @@ def check(text):
 
 
 def search(tweet):
-    """ in_reply_to_status_idから宛先となるツイートを参照する """
+    """ refer a post tweet from comment's in_reply_to_status_id """
 
     retry_max = 5      # Retry MAX
     retry_time = 5     # Retry time
 
-    for r in range(retry_max):
+    for retry in range(retry_max):
 
-        # 言語が日本語、in_reply_to_status_idが明示されており、禁止単語を含まないツイートの場合
+        # cleaning text data
+        tweet['text'] = re.sub(r'\n', r" ", tweet['text'])
+        tweet['text'] = re.sub(r'\r\n', r" ", tweet['text'])
+        tweet['text'] = re.sub(r'@(\w+)', r" ", tweet['text'])
+        tweet['text'] = re.sub(hashtag_pattern, r" ", tweet['text'])
+        tweet['text'] = re.sub(url_pattern, r" ", tweet['text'])
+
+        # if language is Japanese, there is a in_reply_to_status_id, and there are no NG words...
         if 'lang' in tweet and tweet['lang'] == 'ja' \
                 and 'in_reply_to_status_id' in tweet and not tweet['in_reply_to_status_id'] is None \
                 and 'text' in tweet and check(tweet['text']):
@@ -55,6 +68,8 @@ def search(tweet):
             except:
                 time.sleep(retry_time)
                 continue
+
+            # check a post tweet
             if 'lang' in tweet and tweet['lang'] == 'ja' and 'text' in status and check(status['text']):
                 save_text = trim(status['text']) + '\t' + trim(tweet['text']) + '\n'
                 print(save_text, end='\n\n')
@@ -74,8 +89,9 @@ def search(tweet):
 def main():
 
     dir_name = "baseball"
-    filter_words = "ホークス,日ハム,西武,ロッテ,楽天,オリックス,巨人,阪神,カープ,ベイスターズ,中日,ヤクルト"
-    # filter_words = "AKB"
+    filter_words = "ホークス,日ハム,ファイターズ,西武,ライオンズ,ロッテ,マリーンズ,楽天,イーグルス,オリックス," \
+                   "巨人,ジャイアンツ,阪神,タイガース,カープ,ベイスターズ,中日,ドラゴンズ,ヤクルト,スワローズ,先発,中継ぎ,抑え," \
+                   "バッター,打者,ピッチャー,投手,キャッチャー,ショート,サード,外野,内野,プロ野球,"
     if not os.path.isdir('./data/' + dir_name):
         os.mkdir('./data/' + dir_name)
 
