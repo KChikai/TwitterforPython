@@ -51,11 +51,14 @@ def search(tweet):
     for retry in range(retry_max):
 
         # cleaning text data
-        tweet['text'] = re.sub(r'\n', r" ", tweet['text'])
-        tweet['text'] = re.sub(r'\r\n', r" ", tweet['text'])
-        tweet['text'] = re.sub(r'@(\w+)', r" ", tweet['text'])
-        tweet['text'] = re.sub(hashtag_pattern, r" ", tweet['text'])
-        tweet['text'] = re.sub(url_pattern, r" ", tweet['text'])
+        if tweet.get('text') is not None:
+            tweet['text'] = re.sub(r'\n', r" ", tweet['text'])
+            tweet['text'] = re.sub(r'\r\n', r" ", tweet['text'])
+            tweet['text'] = re.sub(r'@(\w+)', r" ", tweet['text'])
+            tweet['text'] = re.sub(hashtag_pattern, r" ", tweet['text'])
+            tweet['text'] = re.sub(url_pattern, r" ", tweet['text'])
+        else:
+            break
 
         # if language is Japanese, there is a in_reply_to_status_id, and there are no NG words...
         if 'lang' in tweet and tweet['lang'] == 'ja' \
