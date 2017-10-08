@@ -8,7 +8,7 @@ morp = cmd.getstatusoutput("echo " + obj + " | mecab -Owakati")
 words = morp[1]
 print('\n', words)
 
-classifier = ft.load_model('data/new.bin')
+classifier = ft.load_model('data/negaposi.bin')
 estimate = classifier.predict([words], k=2)
 estimate_2 = classifier.predict_proba([words], k=2)
 print(estimate[0])

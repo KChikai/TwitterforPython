@@ -60,9 +60,11 @@ API_secret = 'your api secret'
 ```
 
 2. 'cat'等でデータをまとめる and 形態素解析 and タグをつける．
-`negaposi_label.txt`が学習データ
+`negaposi_label.txt`が学習データ．`negaposi`が出力ファイル（拡張子は`bin`で出力される）．
 
 ```
     python learing.py data/negaposi_label.txt negaposi
 
 ```
+
+3.`predict.py`に日本語文を引数として渡すと，評価ラベルが返される（MeCabが必要）．
