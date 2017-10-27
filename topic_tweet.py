@@ -88,7 +88,7 @@ def main():
                 if max_id > tweet["id"] or max_id == 0:
                     max_id = tweet["id"]
                 text = re.sub(r'(\n|\r\n)', r"", tweet['text'])
-                f.write(text + '\n')
+                f.write(tweet["id_str"] + '\t' + text + '\n')
 
             if len(tweets) == 0:
                 break
@@ -98,7 +98,7 @@ def main():
             time.sleep(5)
 
             # time restrict
-            if crawl_count % 175 == 0 and crawl_count != 0:
+            if crawl_count % 170 == 0 and crawl_count != 0:
                 t1 = time.time()
                 if (900 - (t1 - t0)) > 0:
                     print(900 - (t1 - t0), "[sec] time sleep for the next tweet crawl")
